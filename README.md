@@ -21,6 +21,7 @@ API REST para una plataforma de blogs personales, construida con **Node.js, Type
 - [Modelo de datos](#modelo-de-datos)
 - [Arquitectura](#arquitectura)
 - [Decisiones de diseño](#decisiones-de-diseño)
+- [Despliegue en Render](#despliegue-en-render)
 - [Tests y calidad](#tests-y-calidad)
 - [Scripts](#scripts)
 - [Relación con el enunciado de roadmap.sh](#relación-con-el-enunciado-de-roadmapsh)
@@ -353,6 +354,21 @@ tests/
 - **Esquemas Zod como única fuente de verdad.** Los mismos esquemas validan las peticiones, generan los tipos TypeScript y producen la documentación OpenAPI, así que la documentación no puede quedarse desfasada respecto a la validación.
 - **El rol viaja en el access token.** Al cambiar el rol de un usuario se revocan sus refresh tokens; el cambio se aplica como tarde cuando expira el access token actual (15 minutos por defecto).
 - **`trust proxy = 1`.** Pensado para desplegarse detrás de un proxy inverso o balanceador, de forma que el rate limiting use la IP real del cliente.
+
+## Despliegue en Render
+
+El repositorio incluye un [Blueprint de Render](render.yaml) que crea la API y una base de datos PostgreSQL en el plan gratuito.
+
+[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/Ot79/API-de-la-plataforma-de-blogs-personales)
+
+1. En el [dashboard de Render](https://dashboard.render.com), elige **New → Blueprint** y conecta este repositorio (o usa el botón anterior).
+2. Render lee `render.yaml`, crea la base de datos `blogging-platform-db` y el servicio `blogging-platform-api`, conecta `DATABASE_URL` y genera un `JWT_ACCESS_SECRET` aleatorio.
+3. Cada arranque aplica las migraciones pendientes (`npm run db:deploy`) antes de servir tráfico, y el health check usa `/health/ready`.
+4. Los despliegues posteriores se lanzan solos con cada push a `main` cuyo CI pase.
+
+Para cargar los datos de ejemplo en producción, ejecuta una vez en la shell del servicio: `SEED_FORCE=true npm run db:seed` (borra los datos existentes).
+
+Limitaciones del plan gratuito: el servicio se suspende tras 15 minutos sin tráfico (la primera petición tarda unos segundos en despertarlo) y la base de datos gratuita caduca a los 30 días. Para un uso permanente cambia `plan` en `render.yaml` a un plan de pago.
 
 ## Tests y calidad
 
