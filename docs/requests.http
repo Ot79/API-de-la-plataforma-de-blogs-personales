@@ -1,0 +1,111 @@
+# Colección de peticiones para la extensión REST Client (VS Code) o los
+# clientes HTTP de JetBrains. Ejecuta primero `npm run db:seed`.
+
+@baseUrl = http://localhost:3000/api/v1
+@accessToken = pega-aqui-el-accessToken-del-login
+@refreshToken = pega-aqui-el-refreshToken-del-login
+@articleId = pega-aqui-un-id-de-articulo
+
+### Registro
+POST {{baseUrl}}/auth/register
+Content-Type: application/json
+
+{
+  "email": "nuevo@example.com",
+  "username": "nuevo_autor",
+  "password": "Passw0rd!",
+  "displayName": "Nuevo Autor"
+}
+
+### Login (usuario del seed)
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "ada@example.com",
+  "password": "Passw0rd!"
+}
+
+### Usuario autenticado
+GET {{baseUrl}}/auth/me
+Authorization: Bearer {{accessToken}}
+
+### Renovar tokens
+POST {{baseUrl}}/auth/refresh
+Content-Type: application/json
+
+{ "refreshToken": "{{refreshToken}}" }
+
+### Listar artículos publicados
+GET {{baseUrl}}/articles?page=1&limit=10
+
+### Buscar por término
+GET {{baseUrl}}/articles?term=postgresql
+
+### Filtrar por etiquetas, categoría y fechas
+GET {{baseUrl}}/articles?tags=node-js,jwt&category=seguridad&publishedFrom=2026-01-01&sort=publishedAt&order=desc
+
+### Mis borradores
+GET {{baseUrl}}/articles?mine=true&status=DRAFT
+Authorization: Bearer {{accessToken}}
+
+### Obtener por slug
+GET {{baseUrl}}/articles/jwt-y-refresh-tokens-rotacion-y-deteccion-de-reutilizacion
+
+### Crear artículo
+POST {{baseUrl}}/articles
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "title": "Mi nuevo artículo",
+  "content": "## Hola\n\nContenido en **Markdown**.",
+  "category": "Tecnología",
+  "tags": ["Node.js", "API"],
+  "status": "PUBLISHED"
+}
+
+### Actualización parcial
+PATCH {{baseUrl}}/articles/{{articleId}}
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{ "status": "ARCHIVED" }
+
+### Reemplazo completo
+PUT {{baseUrl}}/articles/{{articleId}}
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "title": "Título reemplazado",
+  "content": "Contenido reemplazado",
+  "tags": ["API"],
+  "status": "PUBLISHED"
+}
+
+### Eliminar
+DELETE {{baseUrl}}/articles/{{articleId}}
+Authorization: Bearer {{accessToken}}
+
+### Comentarios de un artículo
+GET {{baseUrl}}/articles/{{articleId}}/comments
+
+### Comentar
+POST {{baseUrl}}/articles/{{articleId}}/comments
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{ "content": "¡Gran artículo!" }
+
+### Etiquetas y categorías
+GET {{baseUrl}}/tags
+
+###
+GET {{baseUrl}}/categories
+
+### Cerrar sesión
+POST {{baseUrl}}/auth/logout
+Content-Type: application/json
+
+{ "refreshToken": "{{refreshToken}}" }
