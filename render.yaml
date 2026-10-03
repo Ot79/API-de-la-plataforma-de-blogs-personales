@@ -28,6 +28,9 @@ services:
         value: '7'
       - key: CORS_ORIGIN
         value: '*'
+      # Render enruta el tráfico a través de su proxy: la IP real llega en X-Forwarded-For.
+      - key: TRUST_PROXY
+        value: '1'
       - key: LOG_LEVEL
         value: info
 

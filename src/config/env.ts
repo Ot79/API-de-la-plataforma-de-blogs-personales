@@ -12,6 +12,8 @@ const envSchema = z.object({
     .default('15m'),
   REFRESH_TOKEN_TTL_DAYS: z.coerce.number().int().min(1).max(365).default(7),
   CORS_ORIGIN: z.string().default('*'),
+  // Número de proxies inversos de confianza delante de la API (0 = acceso directo).
+  TRUST_PROXY: z.coerce.number().int().min(0).max(10).default(0),
   RATE_LIMIT_WINDOW_MS: z.coerce
     .number()
     .int()

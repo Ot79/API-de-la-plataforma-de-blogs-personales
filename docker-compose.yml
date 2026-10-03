@@ -43,6 +43,7 @@ services:
       JWT_ACCESS_EXPIRES_IN: ${JWT_ACCESS_EXPIRES_IN:-15m}
       REFRESH_TOKEN_TTL_DAYS: ${REFRESH_TOKEN_TTL_DAYS:-7}
       CORS_ORIGIN: ${CORS_ORIGIN:-*}
+      TRUST_PROXY: ${TRUST_PROXY:-0}
       LOG_LEVEL: ${LOG_LEVEL:-info}
     depends_on:
       db:

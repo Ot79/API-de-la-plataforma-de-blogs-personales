@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { api } from '../helpers';
+import { api, app } from '../helpers';
 
 describe('Aplicación', () => {
   it('GET / devuelve información de la API', async () => {
@@ -64,5 +64,15 @@ describe('Aplicación', () => {
     const res = await api().get('/health');
     expect(res.headers['x-powered-by']).toBeUndefined();
     expect(res.headers['x-content-type-options']).toBe('nosniff');
+  });
+
+  it('no confía en X-Forwarded-For por defecto (evita falsear la IP ante el rate limit)', () => {
+    expect(app.get('trust proxy')).toBe(0);
+  });
+
+  it('Swagger UI funciona con la CSP por defecto (sin scripts inline)', async () => {
+    const res = await api().get('/docs/');
+    expect(res.headers['content-security-policy']).toContain("script-src 'self'");
+    expect(res.text).not.toMatch(/<script(?![^>]*\bsrc=)[^>]*>/i);
   });
 });

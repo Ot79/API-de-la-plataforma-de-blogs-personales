@@ -27,7 +27,9 @@ export function createApp(): Express {
   const app = express();
 
   app.disable('x-powered-by');
-  app.set('trust proxy', 1);
+  // Solo se confía en X-Forwarded-For si hay proxies conocidos delante; si no,
+  // cualquier cliente podría falsear su IP y saltarse el rate limiting.
+  app.set('trust proxy', env.TRUST_PROXY);
 
   app.use(
     pinoHttp({
@@ -55,8 +57,6 @@ export function createApp(): Express {
     }),
   );
 
-  // La UI de Swagger necesita scripts/estilos inline; se relaja CSP solo en /docs.
-  app.use('/docs', helmet({ contentSecurityPolicy: false }));
   app.use(helmet());
   app.use(cors({ origin: corsOrigin(), exposedHeaders: ['X-Request-Id', 'Location'] }));
   app.use(express.json({ limit: '1mb' }));

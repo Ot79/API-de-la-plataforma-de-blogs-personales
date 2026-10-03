@@ -99,19 +99,20 @@ El seed crea tres usuarios con la contraseña `Passw0rd!`: `admin@example.com` (
 
 Se validan al arrancar; si alguna es inválida la aplicación no inicia y muestra qué falla.
 
-| Variable                 | Por defecto   | Descripción                                                  |
-| ------------------------ | ------------- | ------------------------------------------------------------ |
-| `NODE_ENV`               | `development` | `development`, `test` o `production`                         |
-| `PORT`                   | `3000`        | Puerto HTTP                                                  |
-| `DATABASE_URL`           | (obligatoria) | Cadena de conexión PostgreSQL                                |
-| `JWT_ACCESS_SECRET`      | (obligatoria) | Secreto HS256, mínimo 32 caracteres                          |
-| `JWT_ACCESS_EXPIRES_IN`  | `15m`         | Validez del access token (`900`, `15m`, `1h`, `1d`...)       |
-| `REFRESH_TOKEN_TTL_DAYS` | `7`           | Días de validez del refresh token                            |
-| `CORS_ORIGIN`            | `*`           | Orígenes permitidos separados por coma                       |
-| `RATE_LIMIT_WINDOW_MS`   | `900000`      | Ventana del rate limiting (ms)                               |
-| `RATE_LIMIT_MAX`         | `300`         | Peticiones por IP y ventana en `/api/v1`                     |
-| `AUTH_RATE_LIMIT_MAX`    | `20`          | Peticiones por IP y ventana en registro, login y refresh     |
-| `LOG_LEVEL`              | `info`        | `fatal`, `error`, `warn`, `info`, `debug`, `trace`, `silent` |
+| Variable                 | Por defecto   | Descripción                                                                    |
+| ------------------------ | ------------- | ------------------------------------------------------------------------------ |
+| `NODE_ENV`               | `development` | `development`, `test` o `production`                                           |
+| `PORT`                   | `3000`        | Puerto HTTP                                                                    |
+| `DATABASE_URL`           | (obligatoria) | Cadena de conexión PostgreSQL                                                  |
+| `JWT_ACCESS_SECRET`      | (obligatoria) | Secreto HS256, mínimo 32 caracteres                                            |
+| `JWT_ACCESS_EXPIRES_IN`  | `15m`         | Validez del access token (`900`, `15m`, `1h`, `1d`...)                         |
+| `REFRESH_TOKEN_TTL_DAYS` | `7`           | Días de validez del refresh token                                              |
+| `CORS_ORIGIN`            | `*`           | Orígenes permitidos separados por coma                                         |
+| `TRUST_PROXY`            | `0`           | Proxies inversos de confianza (`0` acceso directo, `1` detrás de Render/Nginx) |
+| `RATE_LIMIT_WINDOW_MS`   | `900000`      | Ventana del rate limiting (ms)                                                 |
+| `RATE_LIMIT_MAX`         | `300`         | Peticiones por IP y ventana en `/api/v1`                                       |
+| `AUTH_RATE_LIMIT_MAX`    | `20`          | Peticiones por IP y ventana en registro, login y refresh                       |
+| `LOG_LEVEL`              | `info`        | `fatal`, `error`, `warn`, `info`, `debug`, `trace`, `silent`                   |
 
 ## Endpoints
 
@@ -353,7 +354,7 @@ tests/
 - **Los listados no incluyen `content`.** Reduce drásticamente el tamaño de las respuestas; el contenido se obtiene en el detalle.
 - **Esquemas Zod como única fuente de verdad.** Los mismos esquemas validan las peticiones, generan los tipos TypeScript y producen la documentación OpenAPI, así que la documentación no puede quedarse desfasada respecto a la validación.
 - **El rol viaja en el access token.** Al cambiar el rol de un usuario se revocan sus refresh tokens; el cambio se aplica como tarde cuando expira el access token actual (15 minutos por defecto).
-- **`trust proxy = 1`.** Pensado para desplegarse detrás de un proxy inverso o balanceador, de forma que el rate limiting use la IP real del cliente.
+- **`trust proxy` configurable y desactivado por defecto.** Si la API confiara siempre en `X-Forwarded-For`, un cliente que la alcance directamente podría falsear su IP y saltarse el rate limiting. Con `TRUST_PROXY=1` (como en el Blueprint de Render) se usa la IP real que añade el proxy de la plataforma.
 
 ## Despliegue en Render
 
